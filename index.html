@@ -397,6 +397,10 @@ function speakName(x){
   const m = s.match(/^(\d+)\s+(.*)$/);
   return rus(m ? ((rank[m[1]] || m[1]) + ' ' + m[2]) : s);
 }
+// Голос Шанти: записанные аудио (22.10 — день Король червы, КПУ 6 червы)
+var VOICE = { '2026-10-22': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3' };
+function playVoice(src) { stopVoice(); var a = new Audio(src); window.__va = a; a.play().catch(function () { alert('Не удалось проиграть голос'); }); }
+function stopVoice() { if (window.__va) { try { window.__va.pause(); } catch (e) {} window.__va = null; } }
 function showDay() {
   const p = document.getElementById('dayPanel');
   if (!sel) { p.style.display = 'none'; return; }
@@ -425,6 +429,7 @@ function showDay() {
     const ctx = (cput && cput.p) ? ('<br>✨ <b>В плюс (ресурс):</b> ' + cput.p + '<br>🌀 <b>В минус (на трансформацию):</b> ' + (cput.m || '')) : ((tp && tp.d ? ' — ' + tp.d : (pd ? ' — ' + pd.d : '')));
     h += keyLine(cpu);
     h += '<div class="desc"><b>Космический гид: ' + rus(cpu) + '</b><span style="font-size:11px;opacity:.7"> — планетный управитель дня</span>' + ctx + '</div>';
+    if (VOICE['cpu:' + cpu]) h += '<button class="pbtn" id="scpubtn" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (КПУ)</button>';
   } else if (cput && cput.note) {
     h += '<div class="desc"><b>Космический гид</b><span style="font-size:11px;opacity:.7"> — событийный план, навигатор</span><br>' + cput.note + '</div>';
   }
@@ -439,6 +444,7 @@ function showDay() {
   };
   const sb = document.getElementById('sbtn');
   if (sb) sb.onclick = () => {
+    if (VOICE[dkey]) { playVoice(VOICE[dkey]); return; } // голос Шанти на сегодня
     let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
     if (cpu) t += ' Космический гид — ' + speakName(cpu) + '. ' + shortCore((tp && tp.d) || (pd && pd.d) || '');
     speakRu(t, 'pavel');
@@ -450,6 +456,8 @@ function showDay() {
   };
   const mb = document.getElementById('mbtn');
   if (mb) mb.onclick = () => openMaster(dkey, 'dates');
+  const scpu = document.getElementById('scpubtn');
+  if (scpu) scpu.onclick = () => playVoice(VOICE['cpu:' + cpu]);
   if (window.__res) showRes();
 }
 
