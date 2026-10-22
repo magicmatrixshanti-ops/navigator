@@ -143,6 +143,7 @@
 <h1>✦ Навигатор: энергии дня ✦</h1>
 <div style="text-align:center;margin:2px 0 4px">
   <button id="projBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🔮 Проект «Матрица»</button>
+  <button id="voiceBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🎙 Голос: М</button>
   <div id="projMenu" style="display:none;max-width:360px;margin:6px auto 0;background:#fffdf6;border:1px solid #c9b98f;border-radius:10px;box-shadow:0 8px 24px rgba(122,92,46,.25);overflow:hidden;font-family:Georgia,serif;text-align:left">
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;cursor:pointer" id="projNav">📅 <b>Навигатор дня</b><div style="font-size:12px;opacity:.7">карта дня и резонанс — здесь, открывает календарь</div></div>
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;opacity:.55">🔮 <b>Матрица (по дате рождения)</b><div style="font-size:12px">скоро — полная карта рождения, 52 карты</div></div>
@@ -360,6 +361,7 @@ function keyLine(card) {
 // ===== Голосовое озвучивание (Web Speech API, бесплатно) =====
 function speakRu(txt, who){
   if(!('speechSynthesis' in window)){ alert('Голосовой вывод не поддерживается этим браузером. Открой сайт в Chrome или Яндекс-Браузере.'); return; }
+  try{ var _mv = localStorage.getItem('matr_voice'); who = (_mv === 'f') ? 'irina' : 'pavel'; }catch(e){}
   if(window.speechSynthesis.speaking || window.speechSynthesis.pending){ window.speechSynthesis.cancel(); return; }
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
@@ -771,6 +773,14 @@ function showRes() {
   };
 })();
 document.getElementById('projBtn').onclick = function(e){ e.stopPropagation(); var m=document.getElementById('projMenu'); m.style.display=(m.style.display==='block')?'none':'block'; };
+document.getElementById('voiceBtn').onclick = function(){
+  var v; try{ v = localStorage.getItem('matr_voice'); }catch(e){}
+  v = (v === 'f') ? 'm' : 'f';
+  try{ localStorage.setItem('matr_voice', v); }catch(e){}
+  this.textContent = (v === 'f') ? '🎙 Голос: Ж' : '🎙 Голос: М';
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+};
+try{ if(localStorage.getItem('matr_voice') === 'f') document.getElementById('voiceBtn').textContent = '🎙 Голос: Ж'; }catch(e){}
 document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
 document.getElementById('projMaster').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'cards'); };
 document.getElementById('projDates').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'dates'); };
