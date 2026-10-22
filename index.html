@@ -579,9 +579,16 @@ function showRes() {
   function save(k,o){ try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){ alert('Не удалось сохранить: хранилище браузера недоступно'); } }
   window.masterData=function(card){ return card?(load(LS)[card]||null):null; };
   window.masterDataDate=function(dk){ return dk?(load(LSD)[dk]||null):null; };
+  function isMaster(){ try{ return !!localStorage.getItem(LS)||!!localStorage.getItem(LSD); }catch(e){ return false; } }
   function allDates(){ var a=[],MD=[31,28,31,30,31,30,31,31,30,31,30,31]; for(var m=1;m<=12;m++)for(var d=1;d<=MD[m-1];d++)a.push(d+'.'+m); return a; }
   window.openMaster=function(card, mode){
     if(document.getElementById('mstOverlay')) return;
+    if(!isMaster()){ // кабинет закрыт паролем — для участников кнопка не работает
+      var p=prompt('Кабинет мастера.\nВведите пароль:');
+      if(p===null) return;
+      if(String(p).trim()!=='шанти'){ alert('Неверный пароль'); return; }
+      try{ localStorage.setItem(LS,'1'); }catch(e){}
+    }
     mode=(mode==='dates')?'dates':'cards';
     var ls=(mode==='dates')?LSD:LS;
     var db=load(ls);
