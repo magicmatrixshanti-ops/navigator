@@ -107,7 +107,7 @@
   try { master = !!localStorage.getItem('matr_master') || !!localStorage.getItem('matr_master_date'); } catch(e){}
   var entered = null;
   try { entered = localStorage.getItem('matr_gate'); } catch(e){}
-  if (!force && (master || entered === dkey(msk()))) return;
+  if (!force && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || master || entered === dkey(msk()))) return; // на своём ПК (localhost) вход не спрашивается
   var d = msk(), dk = dkey(d), word = WORDS[dk] || '';
   var ov = document.createElement('div');
   ov.id = 'gateBox';
