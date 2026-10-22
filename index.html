@@ -482,12 +482,12 @@ function calcRes(birthKey) {
   return { bc, dc, nb, nd, sum, rc };
 }
 // Код доступа К КОСМИЧЕСКОМУ ГИДУ (КПУ): карта гида дня + ваша карта рождения
-function calcResG(birthKey) {
+function calcResG(birthKey, part) {
   const b = DATA.dates[birthKey];
   if (!b) return null;
   const bc = b[0];
   const dv = DATA.dates[key(sel, cur.m)];
-  const dc = dv ? dv[1] : null;
+  const dc = dv ? dv[part === 2 ? 2 : 1] : null;
   if (!bc || !dc) return null;
   const nb = DATA.cards[bc] ? DATA.cards[bc].n : null;
   const nd = DATA.cards[dc] ? DATA.cards[dc].n : null;
@@ -519,7 +519,10 @@ function showRes() {
   const tr = r.rc ? T[r.rc] : null;
   const rdesc = tr && tr.r ? tr.r : (r.rc && DATA.cards[r.rc] ? DATA.cards[r.rc].d : '');
   const g = calcResG(bk);
+  const g2 = calcResG(bk, 2);
   const tg = (g && g.rc) ? T[g.rc] : null;
+  const tg2 = (g2 && g2.rc) ? T[g2.rc] : null;
+  const g2desc = (g2 && g2.rc) ? ((tg2 && tg2.r) ? tg2.r : (DATA.cards[g2.rc] ? DATA.cards[g2.rc].d : '')) : '';
   const gdesc = (g && g.rc) ? ((tg && tg.r) ? tg.r : (DATA.cards[g.rc] ? DATA.cards[g.rc].d : '')) : '';
   const PEREF = {
     'Меркурий': 'сейчас всё решается словом и делом: общение, документы, договорённости. Что важное — скажите вслух и подпишите; мысль сегодня работает как валюта.',
@@ -559,6 +562,18 @@ function showRes() {
       '<div class="formula">' + g.nd + ' + ' + g.nb + ' = ' + (g.nd + g.nb) + (g.nd + g.nb > 52 ? ' − 52 = ' + g.sum : '') + '</div>' +
       keyLine(g.rc) +
       '<div class="res"><div class="desc"><b>\uD83D\uDD17 Ключ к планетарному управителю: ' + rus(g.rc || '\u2014') + '</b>' + (gdesc ? ' \u2014 ' + gdesc : '') + '</div></div>' : '') +
+    (g2 ? '<div style="border-top:2px dashed #c9a86a;margin-top:14px;padding-top:12px"></div>' +
+      '<button class="pbtn" id="sbtn4" style="background:#111;color:#fff;border-color:#111;margin:0 0 10px">▶ Послушать Ключ ко второму планетарному управителю</button>' +
+      '<div class="row">' +
+        '<div><div class="cap">Второй планетный управитель</div>' + face(g2.dc) + '<div class="nm">число ' + g2.nd + '</div></div>' +
+        '<div class="eq">+</div>' +
+        '<div><div class="cap">Ваша карта</div>' + face(g2.bc) + '<div class="nm">число ' + g2.nb + '</div></div>' +
+        '<div class="eq">=</div>' +
+        '<div><div class="cap">Связь с управителем</div>' + face(g2.rc) + '<div class="nm">' + nm(g2.rc) + '</div></div>' +
+      '</div>' +
+      '<div class="formula">' + g2.nd + ' + ' + g2.nb + ' = ' + (g2.nd + g2.nb) + (g2.nd + g2.nb > 52 ? ' − 52 = ' + g2.sum : '') + '</div>' +
+      keyLine(g2.rc) +
+      '<div class="res"><div class="desc"><b>\uD83D\uDD17 Ключ ко второму планетарному управителю: ' + rus(g2.rc || '\u2014') + '</b>' + (g2desc ? ' \u2014 ' + g2desc : '') + '</div></div>' : '') +
     '<div class="call"><b>Хотите подробнее?</b> Посмотрите событийный план на год: какие задачи стоят перед вами в этом году и какие ресурсы есть у вас для их решения. И помните: есть две ветки реальности — работать можно по обеим.</div>' +
     moreBox(bk, '2', r.rc, bk);
   const db = document.getElementById('dbtn2');
@@ -581,6 +596,11 @@ function showRes() {
   const sb3 = document.getElementById('sbtn3');
   if (sb3) sb3.onclick = () => {
     let t = 'Ключ к планетарному управителю — ' + speakName(g.rc) + '. ' + shortCore(gdesc);
+    speakRu(t, 'irina');
+  };
+  const sb4 = document.getElementById('sbtn4');
+  if (sb4) sb4.onclick = () => {
+    let t = 'Ключ ко второму планетарному управителю — ' + speakName(g2.rc) + '. ' + shortCore(g2desc);
     speakRu(t, 'irina');
   };
 }
