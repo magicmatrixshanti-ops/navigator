@@ -398,8 +398,13 @@ function speakName(x){
   return rus(m ? ((rank[m[1]] || m[1]) + ' ' + m[2]) : s);
 }
 // Голос Шанти: записанные аудио (22.10 — день Король червы, КПУ 6 червы)
-var VOICE = { '2026-10-22': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3' };
-function playVoice(src) { stopVoice(); var a = new Audio(src); window.__va = a; a.play().catch(function () { alert('Не удалось проиграть голос'); }); }
+var VOICE = { '22.10': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3' };
+function playVoice(src) {
+  if (window.__va && window.__va.getAttribute('data-src') === src) { stopVoice(); return; } // второй клик — стоп
+  stopVoice();
+  var a = new Audio(src); a.setAttribute('data-src', src); window.__va = a;
+  a.play().catch(function () { alert('Не удалось проиграть голос'); });
+}
 function stopVoice() { if (window.__va) { try { window.__va.pause(); } catch (e) {} window.__va = null; } }
 function showDay() {
   const p = document.getElementById('dayPanel');
