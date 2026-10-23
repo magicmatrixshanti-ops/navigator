@@ -400,7 +400,7 @@ function speakName(x){
   return rus(m ? ((rank[m[1]] || m[1]) + ' ' + m[2]) : s);
 }
 // Голос Шанти: записанные аудио (22.10 — день Король червы, КПУ 6 червы)
-var VOICE = { '22.10': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3' };
+var VOICE = { 'day:Король черв': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3', '22.10': 'audio/korol-cherw.mp3' };
 function playVoice(src) {
   if (window.__va && window.__va.getAttribute('data-src') === src) { stopVoice(); return; } // второй клик — стоп
   stopVoice();
@@ -458,7 +458,7 @@ function showDay() {
   };
   const sb = document.getElementById('sbtn');
   if (sb) sb.onclick = () => {
-    if (VOICE[dkey]) { playVoice(VOICE[dkey]); return; } // голос Шанти на сегодня
+    if (VOICE['day:' + c] || VOICE[dkey]) { playVoice(VOICE['day:' + c] || VOICE[dkey]); return; } // голос Шанти: по карте дня (работает в любой день), иначе по дате
     let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
     if (cpu) t += ' Космический гид — ' + speakName(cpu) + '. ' + shortCore((tp && tp.d) || (pd && pd.d) || '');
     if (cpu2) { const tp2 = T[cpu2], pd2 = DATA.cards[cpu2]; t += ' Второй космический гид — ' + speakName(cpu2) + '. ' + shortCore((tp2 && tp2.d) || (pd2 && pd2.d) || ''); }
@@ -602,6 +602,7 @@ function showRes() {
   };
   const sb2 = document.getElementById('sbtn2');
   if (sb2) sb2.onclick = () => {
+    if (r.rc && VOICE['res:' + r.rc]) { playVoice(VOICE['res:' + r.rc]); return; } // голос Шанти по карте резонанса — работает в любой день
     let t = 'Код доступа — ' + speakName(r.rc) + '. ' + shortCore(rdesc);
     speakRu(t, 'irina');
   };
