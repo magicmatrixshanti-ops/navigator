@@ -291,7 +291,7 @@ function activePer(bk, tNow) {
 function moreBox(bk, suf, cardName, dateKey) {
   suf = suf || '';
   const per = bk ? activePer(bk) : null;
-  let h = '<button class="pbtn" id="dbtn' + suf + '">⇩ Подробнее</button><button id="mbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Кабинет мастера">✎ Для Шанти</button><div class="pract" id="moreBox' + suf + '">';
+  let h = '<button class="pbtn" id="dbtn' + suf + '">⇩ Подробнее</button><button id="mbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Кабинет мастера">✎ Для Шанти</button><button id="audbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Записать голос — дата и карта подставятся сами">🎙 Записать голос</button><div class="pract" id="moreBox' + suf + '">';
   const md = (cardName && window.masterData) ? window.masterData(cardName) : null;
   if (md && (md.desc || md.sym)) h += '<div style="border-left:3px solid #c9a86a;padding:8px 12px;margin:0 0 10px;background:rgba(201,168,106,.08)"><b>✨ Раскрытие карты: ' + rus(cardName) + ' — от Шанти</b><br>' + (md.sym ? md.sym.replace(/\n/g, '<br>') + '<br>' : '') + md.desc.replace(/\n/g, '<br>') + '</div>';
   const mdD = (dateKey && window.masterDataDate) ? window.masterDataDate(dateKey) : null;
@@ -472,6 +472,8 @@ function showDay() {
   };
   const mb = document.getElementById('mbtn');
   if (mb) mb.onclick = () => openMaster(dkey, 'dates');
+  const ab = document.getElementById('audbtn');
+  if (ab) ab.onclick = () => openAudio();
   const scpu = document.getElementById('scpubtn');
   if (scpu) scpu.onclick = () => playVoice(VOICE['cpu:' + cpu]);
   const scpu2 = document.getElementById('scpubtn2');
@@ -596,6 +598,8 @@ function showRes() {
   };
   const mb2 = document.getElementById('mbtn2');
   if (mb2) mb2.onclick = () => openMaster(bk, 'dates');
+  const ab2 = document.getElementById('audbtn2');
+  if (ab2) ab2.onclick = () => openAudio();
   const pb2 = document.getElementById('pbtn2');
   if (pb2) pb2.onclick = () => {
     const b = document.getElementById('practBox2');
