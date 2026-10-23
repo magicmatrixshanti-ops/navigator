@@ -793,10 +793,10 @@ document.getElementById('voiceBtn').onclick = function(){
   v = (v === 'f') ? 'c' : (v === 'c') ? 'm' : 'f';
   try{ localStorage.setItem('matr_voice', v); }catch(e){}
   this.textContent = (v === 'f') ? '🎙 Голос: Ж' : (v === 'c') ? '🎙 Голос: С' : '🎙 Голос: М';
-  this.title = (v === 'f') ? 'Ирина (женский)' : (v === 'c') ? 'Голос Создателя' : 'Павел (мужской)';
+  this.title = (v === 'f') ? 'Ирина (женский)' : (v === 'c') ? 'Голос Создателя — Шанти (её записи)' : 'Павел (мужской)';
   try{ window.speechSynthesis.cancel(); }catch(e){}
 };
-try{ var _iv = localStorage.getItem('matr_voice'); if(_iv === 'f') document.getElementById('voiceBtn').textContent = '🎙 Голос: Ж'; else if(_iv === 'c') document.getElementById('voiceBtn').textContent = '🎙 Голос: С'; }catch(e){}
+try{ var _iv = localStorage.getItem('matr_voice'); var _vb = document.getElementById('voiceBtn'); if(_iv === 'f'){ _vb.textContent = '🎙 Голос: Ж'; _vb.title = 'Ирина (женский)'; } else if(_iv === 'c'){ _vb.textContent = '🎙 Голос: С'; _vb.title = 'Голос Создателя — Шанти (её записи)'; } else { _vb.title = 'Павел (мужской)'; } }catch(e){}
 document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
 document.getElementById('projMaster').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'cards'); };
 document.getElementById('projDates').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'dates'); };
