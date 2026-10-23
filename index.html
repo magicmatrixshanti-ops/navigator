@@ -126,6 +126,7 @@
   function tryOpen(){
     var v = (document.getElementById('gateIn').value || '').trim().toLowerCase();
     var msg = document.getElementById('gateMsg');
+    if (norm(v) === 'создатель') { try { localStorage.setItem('matr_master','1'); localStorage.setItem('matr_master_date', dk); } catch(e){} ov.parentNode.removeChild(ov); return; } // слово мастера — вход всегда и везде
     if (!word) { msg.textContent = 'Сегодня вход закрыт — нет кодового слова.'; return; }
     var h = d.getHours();
     if (!win(d) && entered !== dk) { msg.textContent = (dk === '2026-10-22' ? 'Окно входа сегодня: с 16:00 до 17:00 по Москве.' : 'Окно входа: с 9:00 до 10:00 по Москве. Приходите завтра!'); return; }
