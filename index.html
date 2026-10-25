@@ -149,9 +149,10 @@
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;cursor:pointer" id="projNav">📅 <b>Навигатор дня</b><div style="font-size:12px;opacity:.7">карта дня и резонанс — здесь, открывает календарь</div></div>
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;opacity:.55">🔮 <b>Матрица (по дате рождения)</b><div style="font-size:12px">скоро — полная карта рождения, 52 карты</div></div>
     <div id="projDates" style="padding:10px 14px;cursor:pointer">📅 <b>Даты — для Шанти</b><div style="font-size:12px;opacity:.7">раскрытие дня по дате (28.06, 20.10…)</div></div>
-    <div id="projMaster" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #eadfc2">🎴 <b>Карты — для Шанти</b><div style="font-size:12px;opacity:.7">кабинет мастера — наполнение карт по капельке</div></div>
-    <div id="projAudio" style="padding:10px 14px;cursor:pointer">🎙 <b>Аудио — для Шанти</b><div style="font-size:12px;opacity:.7">говоришь интерпретацию — идёт запись голоса + текст</div></div>
-  </div>
+     <div id="projMaster" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #eadfc2">🎴 <b>Карты — для Шанти</b><div style="font-size:12px;opacity:.7">кабинет мастера — наполнение карт по капельке</div></div>
+     <div id="projAudio" style="padding:10px 14px;cursor:pointer">🎙 <b>Аудио — для Шанти</b><div style="font-size:12px;opacity:.7">говоришь интерпретацию — идёт запись голоса + текст</div></div>
+     <div id="projAudioCatalog" style="padding:10px 14px;cursor:pointer;border-top:1px solid #eadfc2">📚 <b>Каталог аудио по картам</b><div style="font-size:12px;opacity:.7">52 карты — записано ядро или ещё нет</div></div>
+   </div>
 </div>
 <div class="sub">Кликни на дату — откроется ресурс дня и КПУ. Введи дату рождения — получи код доступа (резонанс).</div>
 <div class="nav">
@@ -417,7 +418,11 @@ function speakName(x){
   return rus(m ? ((rank[m[1]] || m[1]) + ' ' + m[2]) : s);
 }
 // Голос Шанти: записанные аудио (22.10 — день Король червы, КПУ 6 червы)
-var VOICE = { 'day:Король черв': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3', '22.10': 'audio/korol-cherw.mp3', 'day:Дама черв': 'audio/dama-cherw.mp3', 'cpu:8 бубен': 'audio/kpu-8-buben.mp3', 'cpu2:5 треф': 'audio/kpu-5-tref.mp3', 'res:Туз треф': 'audio/tuz-tref.mp3', 'res:7 треф': 'audio/7-tref.mp3', 'res:10 бубен': 'audio/10-buben.mp3' };
+ var VOICE = { 'day:Король черв': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3', '22.10': 'audio/korol-cherw.mp3', 'day:Дама черв': 'audio/dama-cherw.mp3', 'cpu:8 бубен': 'audio/kpu-8-buben.mp3', 'cpu2:5 треф': 'audio/kpu-5-tref.mp3', 'res:Туз треф': 'audio/tuz-tref.mp3', 'res:7 треф': 'audio/7-tref.mp3', 'res:10 бубен': 'audio/10-buben.mp3' };
+ function coreVoice(card){
+   if(!card) return null;
+   return VOICE['day:'+card] || VOICE['cpu:'+card] || VOICE['cpu2:'+card] || VOICE['res:'+card] || null;
+ }
 function playVoice(src) {
   if (window.__va && window.__va.getAttribute('data-src') === src) { stopVoice(); return; } // второй клик — стоп
   stopVoice();
@@ -459,7 +464,7 @@ function playVoice(src) {
     const ctx = (cput && cput.p) ? ('<br>✨ <b>В плюс (ресурс):</b> ' + cput.p + '<br>🌀 <b>В минус (на трансформацию):</b> ' + (cput.m || '')) : ((tp && tp.d ? ' — ' + tp.d : (pd ? ' — ' + pd.d : '')));
     h += keyLine(cpu);
     h += '<div class="desc"><b>Космический гид: ' + rus(cpu) + '</b><span style="font-size:11px;opacity:.7"> — планетный управитель дня</span>' + ctx + '</div>';
-    if (VOICE['cpu:' + cpu]) h += '<button class="pbtn" id="scpubtn" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (КПУ)</button>';
+     if (coreVoice(cpu)) h += '<button class="pbtn" id="scpubtn" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (КПУ)</button>';
   } else if (cput && cput.note) {
     h += '<div class="desc"><b>Космический гид</b><span style="font-size:11px;opacity:.7"> — событийный план, навигатор</span><br>' + cput.note + '</div>';
   }
@@ -468,7 +473,7 @@ function playVoice(src) {
     h += keyLine(cpu2);
     h += '<div class="desc"><b>Второй космический гид: ' + rus(cpu2) + '</b><span style="font-size:11px;opacity:.7"> — второй планетный управитель дня</span>' +
       ((tp2 && tp2.d) ? ' — ' + tp2.d : (pd2 ? ' — ' + pd2.d : '')) + '</div>';
-    if (VOICE['cpu2:' + cpu2]) h += '<button class="pbtn" id="scpubtn2" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (второй КПУ)</button>';
+     if (coreVoice(cpu2)) h += '<button class="pbtn" id="scpubtn2" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (второй КПУ)</button>';
   }
   h += '<div class="call"><b>Хотите подробнее?</b> Посмотрите событийный план на год: какие задачи стоят перед вами в этом году и какие ресурсы есть у вас для их решения. И помните: есть две ветки реальности — работать можно по обеим.</div>';
   h += moreBox(birthKey(), '', c, dkey);
@@ -481,7 +486,7 @@ function playVoice(src) {
   };
    const sb = document.getElementById('sbtn');
    if (sb) sb.onclick = () => {
-     if (creatorPlay(VOICE['day:' + c] ? 'day:' + c : dkey)) return; // в режиме «С» только запись Шанти; если её нет — тишина
+     if (voiceMode()==='c') { var src=coreVoice(c) || VOICE[dkey]; if(src) playVoice(src); return; } // в режиме «С» ядро карты или тишина
      let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
     if (cpu) t += ' Космический гид — ' + speakName(cpu) + '. ' + shortCore((tp && tp.d) || (pd && pd.d) || '');
     if (cpu2) { const tp2 = T[cpu2], pd2 = DATA.cards[cpu2]; t += ' Второй космический гид — ' + speakName(cpu2) + '. ' + shortCore((tp2 && tp2.d) || (pd2 && pd2.d) || ''); }
@@ -497,9 +502,9 @@ function playVoice(src) {
   const ab = document.getElementById('audbtn');
   if (ab) ab.onclick = () => openAudio();
    const scpu = document.getElementById('scpubtn');
-   if (scpu) scpu.onclick = () => { if (voiceMode()==='c') playVoice(VOICE['cpu:' + cpu]); };
+   if (scpu) scpu.onclick = () => { if (voiceMode()==='c') { var src=coreVoice(cpu); if(src) playVoice(src); } };
    const scpu2 = document.getElementById('scpubtn2');
-   if (scpu2) scpu2.onclick = () => { if (voiceMode()==='c') playVoice(VOICE['cpu2:' + cpu2]); };
+   if (scpu2) scpu2.onclick = () => { if (voiceMode()==='c') { var src=coreVoice(cpu2); if(src) playVoice(src); } };
   if (window.__res) showRes();
 }
 
@@ -629,19 +634,19 @@ function showRes() {
   };
    const sb2 = document.getElementById('sbtn2');
    if (sb2) sb2.onclick = () => {
-     if (creatorPlay(r.rc ? 'res:' + r.rc : '')) return; // режим «С»: запись резонанса или тишина
+     if (voiceMode()==='c') { var src=coreVoice(r.rc); if(src) playVoice(src); return; } // режим «С»: ядро карты или тишина
      let t = 'Код доступа — ' + speakName(r.rc) + '. ' + shortCore(rdesc);
      speakRu(t, 'irina');
    };
    const sb3 = document.getElementById('sbtn3');
    if (sb3) sb3.onclick = () => {
-     if (creatorPlay(g && g.rc ? 'res:' + g.rc : '')) return; // режим «С»: запись ключа или тишина
+     if (voiceMode()==='c') { var src=coreVoice(g && g.rc); if(src) playVoice(src); return; } // режим «С»: ядро карты или тишина
      let t = 'Ключ к планетарному управителю — ' + speakName(g.rc) + '. ' + shortCore(gdesc);
      speakRu(t, 'irina');
    };
    const sb4 = document.getElementById('sbtn4');
    if (sb4) sb4.onclick = () => {
-     if (creatorPlay(g2 && g2.rc ? 'res:' + g2.rc : '')) return; // режим «С»: запись второго ключа или тишина
+     if (voiceMode()==='c') { var src=coreVoice(g2 && g2.rc); if(src) playVoice(src); return; } // режим «С»: ядро карты или тишина
      let t = 'Ключ ко второму планетарному управителю — ' + speakName(g2.rc) + '. ' + shortCore(g2desc);
     speakRu(t, 'irina');
   };
@@ -762,14 +767,14 @@ function showRes() {
     var mdDay=ov.querySelector('#mdDay'), mdCpu=ov.querySelector('#mdCpu'), mdCpu2=ov.querySelector('#mdCpu2');
     function dkOf(v){ var p=String(v||'').split('-'); return (p.length===3)?((+p[2])+'.'+(+p[1])):''; }
     function clean(s){ return String(s||'').replace(/·\s*число\s*\d+/g,'').trim().replace(/червы$/,'черв'); }
-    function hasNow(){
-      try{
-        var q1=clean(dc), q2=clean(kk), q3=clean(k2);
-        if(mode==='cpu') return !!(q2 && VOICE['cpu:'+q2]);
-        if(mode==='cpu2') return !!(q3 && VOICE['cpu2:'+q3]);
-        return !!((q1 && VOICE['day:'+q1]) || VOICE[dkOf(d.value)] || (q1 && VOICE['res:'+q1]));
-      }catch(e){ return false; }
-    }
+     function hasNow(){
+       try{
+         var q1=clean(dc), q2=clean(kk), q3=clean(k2);
+         if(mode==='cpu') return !!(q2 && coreVoice(q2));
+         if(mode==='cpu2') return !!(q3 && coreVoice(q3));
+         return !!((q1 && coreVoice(q1)) || VOICE[dkOf(d.value)]);
+       }catch(e){ return false; }
+     }
     function stShow(){
       var h=ov.querySelector('#audHas'); if(!h) return;
       var lab=(mode==='cpu')?'КПУ':(mode==='cpu2')?'второй КПУ':'карта дня';
@@ -847,6 +852,30 @@ function showRes() {
     ov.querySelector('#audCls').onclick=function(){ try{ if(rec&&rec.state==='recording'){ rec.stop(); } }catch(e){} try{ if(sr){ sr.onend=null; sr.stop(); } }catch(e){} ov.remove(); };
   };
 })();
+// ===== КАТАЛОГ АУДИО ПО ЯДРУ КАРТЫ (только для Шанти) =====
+(function(){
+  window.openAudioCatalog=function(){
+    if(!masterUI() || document.getElementById('audioCatalogOverlay')) return;
+    var ov=document.createElement('div'); ov.id='audioCatalogOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:#14141f;color:#eee;z-index:100;font-family:Georgia,serif;overflow:auto;padding:20px';
+    var suits=[['♥','черв'],['♣','треф'],['♦','бубен'],['♠','пик']];
+    var ranks=['Туз','2','3','4','5','6','7','8','9','10','Валет','Дама','Король'];
+    var cards=[]; suits.forEach(function(s){ ranks.forEach(function(r){ cards.push(r+' '+s[1]); }); });
+    function src(card){ return coreVoice(card); }
+    var withAudio=cards.filter(function(c){return !!src(c);}).length;
+    var h='<div style="max-width:760px;margin:0 auto">'+
+      '<h2 style="text-align:center">📚 Каталог аудио по картам</h2>'+
+      '<div style="text-align:center;color:#bbc;font-size:13px;margin-bottom:14px">Записывается одно ядро карты. Оно подходит для карты дня, КПУ, второго КПУ, резонанса и ключа управителя.</div>'+
+      '<div style="text-align:center;margin-bottom:14px;color:#e8c07a">✅ Записано: '+withAudio+' из 52 &nbsp; ◯ Осталось: '+(52-withAudio)+'</div>';
+    suits.forEach(function(s){
+      h+='<h3 style="border-bottom:1px solid #555;padding-bottom:5px;margin-top:18px">'+s[0]+' '+s[1]+'</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px">';
+      ranks.forEach(function(r){ var card=r+' '+s[1], f=src(card); h+='<div style="padding:8px 10px;border:1px solid '+(f?'#596f4d':'#444')+';border-radius:6px;color:'+(f?'#d8f0c8':'#aaa')+'">'+(f?'✅':'◯')+' <b>'+card+'</b>'+(f?'<div style="font-size:11px;color:#9aa;word-break:break-all;margin-top:3px">'+f+'</div>':''); h+='</div>'; });
+      h+='</div>';
+    });
+    h+='<div style="text-align:center;margin:22px 0"><button id="audioCatalogClose" style="padding:9px 18px;cursor:pointer">✕ Закрыть</button></div></div>';
+    ov.innerHTML=h; document.body.appendChild(ov); document.getElementById('audioCatalogClose').onclick=function(){ov.remove();};
+  };
+})();
 document.getElementById('projBtn').onclick = function(e){ e.stopPropagation(); var m=document.getElementById('projMenu'); m.style.display=(m.style.display==='block')?'none':'block'; };
 document.getElementById('voiceBtn').onclick = function(){
   var v; try{ v = localStorage.getItem('matr_voice'); }catch(e){}
@@ -875,7 +904,8 @@ document.getElementById('voiceBtn').onclick = function(){
  document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
 document.getElementById('projMaster').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'cards'); };
 document.getElementById('projDates').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'dates'); };
-document.getElementById('projAudio').onclick = function(){ document.getElementById('projMenu').style.display='none'; openAudio(); };
+ document.getElementById('projAudio').onclick = function(){ document.getElementById('projMenu').style.display='none'; openAudio(); };
+ document.getElementById('projAudioCatalog').onclick = function(){ document.getElementById('projMenu').style.display='none'; openAudioCatalog(); };
 document.addEventListener('click', function(e){ var m=document.getElementById('projMenu'); if(m && m.style.display==='block' && !m.contains(e.target)) m.style.display='none'; });
 document.getElementById('prev').onclick = () => { cur.m--; if (cur.m < 0) { cur.m = 11; cur.y--; } sel = null; document.getElementById('dayPanel').style.display = 'none'; render(); };
 document.getElementById('next').onclick = () => { cur.m++; if (cur.m > 11) { cur.m = 0; cur.y++; } sel = null; document.getElementById('dayPanel').style.display = 'none'; render(); };
