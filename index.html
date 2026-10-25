@@ -365,7 +365,8 @@ function keyLine(card) {
 function speakRu(txt, who){
   if(!('speechSynthesis' in window)){ alert('Голосовой вывод не поддерживается этим браузером. Открой сайт в Chrome или Яндекс-Браузере.'); return; }
   try{ var _mv = localStorage.getItem('matr_voice'); if(_mv === 'c') return; who = (_mv === 'f') ? 'irina' : 'pavel'; }catch(e){}
-  if(window.speechSynthesis.speaking || window.speechSynthesis.pending){ window.speechSynthesis.cancel(); return; }
+  // Каждый клик должен запускать текст заново: зависшее состояние speechSynthesis
+  // не должно превращать первый клик в беззвучный только cancel().
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
   u.lang='ru-RU'; u.rate=0.95; u.pitch=1.0;
