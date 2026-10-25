@@ -144,6 +144,7 @@
 <div style="text-align:center;margin:2px 0 4px">
   <button id="projBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🔮 Проект «Матрица»</button>
   <button id="voiceBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🎙 Голос: М</button>
+  <button id="speedBtn" style="padding:7px 10px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">⏩ Скорость: 1,2×</button>
   <div id="projMenu" style="display:none;max-width:360px;margin:6px auto 0;background:#fffdf6;border:1px solid #c9b98f;border-radius:10px;box-shadow:0 8px 24px rgba(122,92,46,.25);overflow:hidden;font-family:Georgia,serif;text-align:left">
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;cursor:pointer" id="projNav">📅 <b>Навигатор дня</b><div style="font-size:12px;opacity:.7">карта дня и резонанс — здесь, открывает календарь</div></div>
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;opacity:.55">🔮 <b>Матрица (по дате рождения)</b><div style="font-size:12px">скоро — полная карта рождения, 52 карты</div></div>
@@ -370,15 +371,16 @@ function speakRu(txt, who){
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
   u.lang='ru-RU'; u.rate=0.95; u.pitch=1.0;
+  try{ u.rate = parseFloat(localStorage.getItem('matr_speed') || '1.2'); }catch(e){ u.rate=1.2; }
   const pickVoice = function(vs){
     if(who==='pavel'){
       const pv = vs.find(v=>/pavel|павел/i.test(v.name));
-      if(pv){ u.voice = pv; u.rate = 1.9; }
-      else { u.voice = vs.find(v=>/male|муж/i.test(v.name)) || vs[0]; u.rate = 1.9; }
+      if(pv){ u.voice = pv; }
+      else { u.voice = vs.find(v=>/male|муж/i.test(v.name)) || vs[0]; }
     } else if(who==='irina'){
       const ir = vs.find(v=>/irina|ирина/i.test(v.name));
-      if(ir){ u.voice = ir; u.rate = 1.9; }
-      else { u.voice = vs[0]; u.rate = 1.9; }
+      if(ir){ u.voice = ir; }
+      else { u.voice = vs[0]; }
     } else {
       u.voice = vs.find(v=>/irina|milena|alena|katya|female|женск/i.test(v.name)) || vs[0];
     }
@@ -852,9 +854,18 @@ document.getElementById('voiceBtn').onclick = function(){
   try{ localStorage.setItem('matr_voice', v); }catch(e){}
   this.textContent = (v === 'f') ? '🎙 Голос: Ж' : (v === 'c') ? '🎙 Голос: С' : '🎙 Голос: М';
   this.title = (v === 'f') ? 'Ирина (женский)' : (v === 'c') ? 'Голос Создателя — Шанти (её записи)' : 'Павел (мужской)';
-  try{ window.speechSynthesis.cancel(); }catch(e){}
+ try{ window.speechSynthesis.cancel(); }catch(e){}
 };
+ document.getElementById('speedBtn').onclick = function(){
+   var vals=[1.2,1.4,1.6,1.8], curSpeed=1.2;
+   try{ curSpeed=parseFloat(localStorage.getItem('matr_speed')||'1.2'); }catch(e){}
+   var i=vals.indexOf(curSpeed); var next=vals[(i<0?0:i+1)%vals.length];
+   try{ localStorage.setItem('matr_speed',String(next)); }catch(e){}
+   this.textContent='⏩ Скорость: '+String(next).replace('.',',')+'×';
+   try{ window.speechSynthesis.cancel(); }catch(e){}
+ };
  try{ var _iv = localStorage.getItem('matr_voice'); var _vb = document.getElementById('voiceBtn'); if(_iv === 'f'){ _vb.textContent = '🎙 Голос: Ж'; _vb.title = 'Ирина (женский)'; } else if(_iv === 'c'){ _vb.textContent = '🎙 Голос: С'; _vb.title = 'Голос Создателя — Шанти (её записи)'; } else { _vb.title = 'Павел (мужской)'; } }catch(e){}
+ try{ var _sp = parseFloat(localStorage.getItem('matr_speed')||'1.2'); var _sb = document.getElementById('speedBtn'); _sb.textContent='⏩ Скорость: '+String(_sp).replace('.',',')+'×'; }catch(e){}
  if(!masterUI()){
    var _pb = document.getElementById('projBtn');
    var _pm = document.getElementById('projMenu');
