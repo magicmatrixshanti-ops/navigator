@@ -370,12 +370,11 @@ function speakRu(txt, who){
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
   u.lang='ru-RU'; u.rate=0.95; u.pitch=1.0;
-  const vs = (window.speechSynthesis.getVoices()||[]).filter(v=>v.lang && v.lang.toLowerCase().indexOf('ru')===0);
-  if(vs.length){
+  const pickVoice = function(vs){
     if(who==='pavel'){
       const pv = vs.find(v=>/pavel|павел/i.test(v.name));
       if(pv){ u.voice = pv; u.rate = 1.9; }
-      else { u.voice = vs[0]; u.rate = 1.9; }
+      else { u.voice = vs.find(v=>/male|муж/i.test(v.name)) || vs[0]; u.rate = 1.9; }
     } else if(who==='irina'){
       const ir = vs.find(v=>/irina|ирина/i.test(v.name));
       if(ir){ u.voice = ir; u.rate = 1.9; }
@@ -383,8 +382,20 @@ function speakRu(txt, who){
     } else {
       u.voice = vs.find(v=>/irina|milena|alena|katya|female|женск/i.test(v.name)) || vs[0];
     }
+  };
+  const vs = (window.speechSynthesis.getVoices()||[]).filter(v=>v.lang && v.lang.toLowerCase().indexOf('ru')===0);
+  if(vs.length){ pickVoice(vs); window.speechSynthesis.speak(u); }
+  else {
+    // На первом клике Chrome/Яндекс иногда ещё не успевает вернуть список голосов.
+    // Ждём его, иначе режим «М» мог случайно уйти в голос браузера (часто женский).
+    const onVoices = function(){
+      const ready = (window.speechSynthesis.getVoices()||[]).filter(v=>v.lang && v.lang.toLowerCase().indexOf('ru')===0);
+      if(!ready.length) return;
+      window.speechSynthesis.removeEventListener('voiceschanged', onVoices);
+      pickVoice(ready); window.speechSynthesis.speak(u);
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', onVoices);
   }
-  window.speechSynthesis.speak(u);
 }
 // Краткое ядро для озвучки: первая строка описания, обрезается по первому предложению
 function shortCore(s){
