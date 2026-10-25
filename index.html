@@ -288,10 +288,13 @@ function activePer(bk, tNow) {
   }
   return null;
 }
-function moreBox(bk, suf, cardName, dateKey) {
+ function masterUI(){
+   try{ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || !!localStorage.getItem('matr_master') || !!localStorage.getItem('matr_master_date'); }catch(e){ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname); }
+ }
+ function moreBox(bk, suf, cardName, dateKey) {
   suf = suf || '';
   const per = bk ? activePer(bk) : null;
-  let h = '<button class="pbtn" id="dbtn' + suf + '">⇩ Подробнее</button><button id="mbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Кабинет мастера">✎ Для Шанти</button><button id="audbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Записать голос — дата и карта подставятся сами">🎙 Записать голос</button><div class="pract" id="moreBox' + suf + '">';
+   let h = '<button class="pbtn" id="dbtn' + suf + '">⇩ Подробнее</button>' + (masterUI() ? '<button id="mbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Кабинет мастера">✎ Для Шанти</button><button id="audbtn' + suf + '" style="margin-left:8px;padding:7px 11px;font-size:13px;opacity:.7;cursor:pointer;border:1px dashed #888;background:none;color:inherit" title="Записать голос — дата и карта подставятся сами">🎙 Записать голос</button>' : '') + '<div class="pract" id="moreBox' + suf + '">';
   const md = (cardName && window.masterData) ? window.masterData(cardName) : null;
   if (md && (md.desc || md.sym)) h += '<div style="border-left:3px solid #c9a86a;padding:8px 12px;margin:0 0 10px;background:rgba(201,168,106,.08)"><b>✨ Раскрытие карты: ' + rus(cardName) + ' — от Шанти</b><br>' + (md.sym ? md.sym.replace(/\n/g, '<br>') + '<br>' : '') + md.desc.replace(/\n/g, '<br>') + '</div>';
   const mdD = (dateKey && window.masterDataDate) ? window.masterDataDate(dateKey) : null;
@@ -401,15 +404,21 @@ function speakName(x){
   return rus(m ? ((rank[m[1]] || m[1]) + ' ' + m[2]) : s);
 }
 // Голос Шанти: записанные аудио (22.10 — день Король червы, КПУ 6 червы)
-var VOICE = { 'day:Король черв': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3', '22.10': 'audio/korol-cherw.mp3' };
+var VOICE = { 'day:Король черв': 'audio/korol-cherw.mp3', 'cpu:6 черв': 'audio/kpu-6-cherw.mp3', '22.10': 'audio/korol-cherw.mp3', 'day:Дама черв': 'audio/dama-cherw.mp3', 'cpu:8 бубен': 'audio/kpu-8-buben.mp3', 'cpu2:5 треф': 'audio/kpu-5-tref.mp3', 'res:Туз треф': 'audio/tuz-tref.mp3', 'res:7 треф': 'audio/7-tref.mp3', 'res:10 бубен': 'audio/10-buben.mp3' };
 function playVoice(src) {
   if (window.__va && window.__va.getAttribute('data-src') === src) { stopVoice(); return; } // второй клик — стоп
   stopVoice();
   var a = new Audio(src); a.setAttribute('data-src', src); window.__va = a;
-  a.play().catch(function () { alert('Не удалось проиграть голос'); });
+  a.play().catch(function () { /* в режиме «С» отсутствие записи или запрет autoplay = тишина */ });
 }
-function stopVoice() { if (window.__va) { try { window.__va.pause(); } catch (e) {} window.__va = null; } }
-function showDay() {
+ function stopVoice() { if (window.__va) { try { window.__va.pause(); } catch (e) {} window.__va = null; } }
+ function voiceMode(){ try{ return localStorage.getItem('matr_voice') || 'm'; }catch(e){ return 'm'; } }
+ function creatorPlay(key){
+   if(voiceMode()!=='c') return false;
+   if(key && VOICE[key]) playVoice(VOICE[key]);
+   return true;
+ }
+ function showDay() {
   const p = document.getElementById('dayPanel');
   if (!sel) { p.style.display = 'none'; return; }
   const dkey = key(sel, cur.m);
@@ -457,10 +466,10 @@ function showDay() {
     const b = document.getElementById('practBox');
     b.style.display = b.style.display === 'block' ? 'none' : 'block';
   };
-  const sb = document.getElementById('sbtn');
-  if (sb) sb.onclick = () => {
-    if (VOICE['day:' + c] || VOICE[dkey]) { playVoice(VOICE['day:' + c] || VOICE[dkey]); return; } // голос Шанти: по карте дня (работает в любой день), иначе по дате
-    let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
+   const sb = document.getElementById('sbtn');
+   if (sb) sb.onclick = () => {
+     if (creatorPlay(VOICE['day:' + c] ? 'day:' + c : dkey)) return; // в режиме «С» только запись Шанти; если её нет — тишина
+     let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
     if (cpu) t += ' Космический гид — ' + speakName(cpu) + '. ' + shortCore((tp && tp.d) || (pd && pd.d) || '');
     if (cpu2) { const tp2 = T[cpu2], pd2 = DATA.cards[cpu2]; t += ' Второй космический гид — ' + speakName(cpu2) + '. ' + shortCore((tp2 && tp2.d) || (pd2 && pd2.d) || ''); }
     speakRu(t, 'pavel');
@@ -474,10 +483,10 @@ function showDay() {
   if (mb) mb.onclick = () => openMaster(dkey, 'dates');
   const ab = document.getElementById('audbtn');
   if (ab) ab.onclick = () => openAudio();
-  const scpu = document.getElementById('scpubtn');
-  if (scpu) scpu.onclick = () => playVoice(VOICE['cpu:' + cpu]);
-  const scpu2 = document.getElementById('scpubtn2');
-  if (scpu2) scpu2.onclick = () => playVoice(VOICE['cpu2:' + cpu2]);
+   const scpu = document.getElementById('scpubtn');
+   if (scpu) scpu.onclick = () => { if (voiceMode()==='c') playVoice(VOICE['cpu:' + cpu]); };
+   const scpu2 = document.getElementById('scpubtn2');
+   if (scpu2) scpu2.onclick = () => { if (voiceMode()==='c') playVoice(VOICE['cpu2:' + cpu2]); };
   if (window.__res) showRes();
 }
 
@@ -605,20 +614,22 @@ function showRes() {
     const b = document.getElementById('practBox2');
     b.style.display = b.style.display === 'block' ? 'none' : 'block';
   };
-  const sb2 = document.getElementById('sbtn2');
-  if (sb2) sb2.onclick = () => {
-    if (r.rc && VOICE['res:' + r.rc]) { playVoice(VOICE['res:' + r.rc]); return; } // голос Шанти по карте резонанса — работает в любой день
-    let t = 'Код доступа — ' + speakName(r.rc) + '. ' + shortCore(rdesc);
-    speakRu(t, 'irina');
-  };
-  const sb3 = document.getElementById('sbtn3');
-  if (sb3) sb3.onclick = () => {
-    let t = 'Ключ к планетарному управителю — ' + speakName(g.rc) + '. ' + shortCore(gdesc);
-    speakRu(t, 'irina');
-  };
-  const sb4 = document.getElementById('sbtn4');
-  if (sb4) sb4.onclick = () => {
-    let t = 'Ключ ко второму планетарному управителю — ' + speakName(g2.rc) + '. ' + shortCore(g2desc);
+   const sb2 = document.getElementById('sbtn2');
+   if (sb2) sb2.onclick = () => {
+     if (creatorPlay(r.rc ? 'res:' + r.rc : '')) return; // режим «С»: запись резонанса или тишина
+     let t = 'Код доступа — ' + speakName(r.rc) + '. ' + shortCore(rdesc);
+     speakRu(t, 'irina');
+   };
+   const sb3 = document.getElementById('sbtn3');
+   if (sb3) sb3.onclick = () => {
+     if (creatorPlay(g && g.rc ? 'res:' + g.rc : '')) return; // режим «С»: запись ключа или тишина
+     let t = 'Ключ к планетарному управителю — ' + speakName(g.rc) + '. ' + shortCore(gdesc);
+     speakRu(t, 'irina');
+   };
+   const sb4 = document.getElementById('sbtn4');
+   if (sb4) sb4.onclick = () => {
+     if (creatorPlay(g2 && g2.rc ? 'res:' + g2.rc : '')) return; // режим «С»: запись второго ключа или тишина
+     let t = 'Ключ ко второму планетарному управителю — ' + speakName(g2.rc) + '. ' + shortCore(g2desc);
     speakRu(t, 'irina');
   };
 }
@@ -699,6 +710,8 @@ function showRes() {
         '<label style="font-size:13px;color:#9aa">Дата<input id="audDate" type="date" style="display:block;margin-top:4px;padding:7px;background:#1d1d2c;color:#eee;border:1px solid #555"></label>'+
         '<label style="flex:1;min-width:240px;font-size:13px;color:#9aa">Карта дня и КПУ (для имени файла)<input id="audCard" style="display:block;width:100%;margin-top:4px;padding:7px;background:#1d1d2c;color:#eee;border:1px solid #555"></label>'+
       '</div>'+
+      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0;align-items:center"><span style="font-size:13px;color:#9aa">Что записываем:</span><button id="mdDay" style="padding:6px 12px;cursor:pointer">🎙 Карта дня</button><button id="mdCpu" style="padding:6px 12px;cursor:pointer">🎙 КПУ</button><button id="mdCpu2" style="padding:6px 12px;cursor:pointer;display:none">🎙 Второй КПУ</button></div>'+
+      '<div id="audHas" style="text-align:center;font-size:13px;color:#9aa;min-height:18px;margin-bottom:6px"></div>'+
       '<div style="text-align:center;margin:10px 0"><button id="audRec" style="padding:12px 26px;font-size:17px;cursor:pointer;background:#b33;color:#fff;border:none;border-radius:8px;font-family:Georgia,serif">● Начать запись</button></div>'+
       '<div id="audSt" style="text-align:center;color:#8f8;min-height:22px;font-size:14px"></div>'+
       '<div style="margin:6px 0"><div style="font-size:13px;color:#9aa">Текст (распознаётся, можно править)</div><textarea id="audTxt" rows="7" style="width:100%;box-sizing:border-box;background:#1d1d2c;color:#eee;border:1px solid #555;padding:8px;font-size:14px" placeholder="…говори — текст появится здесь"></textarea></div>'+
@@ -717,12 +730,13 @@ function showRes() {
         msg=ov.querySelector('#audMsg'), nm=ov.querySelector('#audName');
     var now=new Date(); d.value=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
     // подсказка «карта дня / КПУ» из открытого дня
+    var dc='', kk='', k2='';
     try{
       var p=document.getElementById('dayPanel');
       if(p && p.style.display!=='none'){
         var caps=p.querySelectorAll('.cap'), vals={};
         for(var i=0;i<caps.length;i++){ var t=caps[i].textContent.trim(), nn=caps[i].parentNode.querySelector('.nm'); if(nn) vals[t]=nn.textContent.trim(); }
-        var dc=vals['Ресурс дня']||'', kk=vals['Космический гид (КПУ)']||'';
+        dc=vals['Ресурс дня']||''; kk=vals['Космический гид (КПУ)']||''; k2=vals['КПУ (вторая)']||vals['КПУ']||'';
         if(dc||kk) cardIn.value=(dc+(kk?' / КПУ '+kk:'')).trim();
       }
       if(typeof cur!=='undefined' && typeof sel!=='undefined' && sel){ d.value=cur.y+'-'+pad(cur.m+1)+'-'+pad(sel); }
@@ -730,6 +744,32 @@ function showRes() {
     function ext(){ var t=(blob&&blob.type)||''; return t.indexOf('mp4')>=0?'.m4a':'.webm'; }
     function upd(){ nm.textContent='Имя файла: '+fname(d.value, cardIn.value, blob?ext():'.webm'); }
     d.onchange=upd; cardIn.oninput=upd; upd();
+    // --- статус: какие записи на эту дату уже подключены + кнопки выбора «что записываем» ---
+    var mode='day';
+    var mdDay=ov.querySelector('#mdDay'), mdCpu=ov.querySelector('#mdCpu'), mdCpu2=ov.querySelector('#mdCpu2');
+    function dkOf(v){ var p=String(v||'').split('-'); return (p.length===3)?((+p[2])+'.'+(+p[1])):''; }
+    function clean(s){ return String(s||'').replace(/·\s*число\s*\d+/g,'').trim().replace(/червы$/,'черв'); }
+    function hasNow(){
+      try{
+        var q1=clean(dc), q2=clean(kk), q3=clean(k2);
+        if(mode==='cpu') return !!(q2 && VOICE['cpu:'+q2]);
+        if(mode==='cpu2') return !!(q3 && VOICE['cpu2:'+q3]);
+        return !!((q1 && VOICE['day:'+q1]) || VOICE[dkOf(d.value)] || (q1 && VOICE['res:'+q1]));
+      }catch(e){ return false; }
+    }
+    function stShow(){
+      var h=ov.querySelector('#audHas'); if(!h) return;
+      var lab=(mode==='cpu')?'КПУ':(mode==='cpu2')?'второй КПУ':'карта дня';
+      var ok=hasNow();
+      h.innerHTML=(ok?'✅':'◯')+' «'+lab+'» — '+(ok?'запись уже есть и подключена к дню':'ещё не записано');
+      h.style.color=ok?'#8f8':'#9aa';
+      function mark(b,on){ b.style.border='1px solid '+(on?'#e8c07a':'#555'); b.style.background=on?'#3a3320':''; }
+      mark(mdDay, mode==='day'); mark(mdCpu, mode==='cpu'); mark(mdCpu2, mode==='cpu2');
+    }
+    mdDay.onclick=function(){ mode='day'; cardIn.value=(dc+(kk?' / КПУ '+kk:'')).trim(); upd(); stShow(); };
+    mdCpu.onclick=function(){ mode='cpu'; cardIn.value=kk?('КПУ '+kk):''; upd(); stShow(); };
+    if(k2){ mdCpu2.style.display=''; mdCpu2.onclick=function(){ mode='cpu2'; cardIn.value=('КПУ '+k2); upd(); stShow(); }; }
+    stShow();
     var rec=null, chunks=[], sr=null, stream=null, blob=null;
     recB.onclick=function(){
       if(rec && rec.state==='recording'){
@@ -766,9 +806,15 @@ function showRes() {
     function dl(name){
       var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
     }
-    function doSave(again){
+    function doSave(again, force){
       var name=fname(d.value, cardIn.value, ext());
       if(!blob){ msg.style.color='#fa8'; msg.textContent='Сначала запиши запись и нажми ■ Стоп'; return; }
+      if(dirH && !force){
+        return dirH.getFileHandle(name).then(function(){
+          if(window.confirm('Такой файл уже есть в «Звук»: '+name+'\nЗаменить его?')){ return doSave(again, true); }
+          msg.style.color='#fa8'; msg.textContent='Не трогаем — файл уже есть: '+name;
+        }).catch(function(){ return doSave(again, true); });
+      }
       if(!window.showDirectoryPicker){ dl(name); msg.style.color='#fa8'; msg.textContent='Браузер не умеет писать в папку — файл скачался в «Загрузки», перетащи его в «Командная работа\\Звук»'; return; }
       try{
         if(!dirH){ dirH=window.__audDir||null; }
@@ -797,8 +843,14 @@ document.getElementById('voiceBtn').onclick = function(){
   this.title = (v === 'f') ? 'Ирина (женский)' : (v === 'c') ? 'Голос Создателя — Шанти (её записи)' : 'Павел (мужской)';
   try{ window.speechSynthesis.cancel(); }catch(e){}
 };
-try{ var _iv = localStorage.getItem('matr_voice'); var _vb = document.getElementById('voiceBtn'); if(_iv === 'f'){ _vb.textContent = '🎙 Голос: Ж'; _vb.title = 'Ирина (женский)'; } else if(_iv === 'c'){ _vb.textContent = '🎙 Голос: С'; _vb.title = 'Голос Создателя — Шанти (её записи)'; } else { _vb.title = 'Павел (мужской)'; } }catch(e){}
-document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
+ try{ var _iv = localStorage.getItem('matr_voice'); var _vb = document.getElementById('voiceBtn'); if(_iv === 'f'){ _vb.textContent = '🎙 Голос: Ж'; _vb.title = 'Ирина (женский)'; } else if(_iv === 'c'){ _vb.textContent = '🎙 Голос: С'; _vb.title = 'Голос Создателя — Шанти (её записи)'; } else { _vb.title = 'Павел (мужской)'; } }catch(e){}
+ if(!masterUI()){
+   var _pb = document.getElementById('projBtn');
+   var _pm = document.getElementById('projMenu');
+   if(_pb) _pb.style.display='none';
+   if(_pm) _pm.style.display='none';
+ }
+ document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
 document.getElementById('projMaster').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'cards'); };
 document.getElementById('projDates').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'dates'); };
 document.getElementById('projAudio').onclick = function(){ document.getElementById('projMenu').style.display='none'; openAudio(); };
