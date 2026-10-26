@@ -723,7 +723,7 @@ function showRes() {
     var c=(card||'').replace(/·\s*число\s*\d+/g,'').replace(/[\\\/:*?"<>|]+/g,'').replace(/\s+/g,' ').trim();
     return dateStr+' аудио'+(c?' — '+c:'')+(ext||'.webm');
   }
-  window.openAudio=function(){
+  window.openAudio=function(presetCard){
     if(document.getElementById('audOverlay')) return;
     var ov=document.createElement('div'); ov.id='audOverlay';
     ov.style.cssText='position:fixed;inset:0;background:#14141f;color:#eee;z-index:99;font-family:Georgia,serif;overflow:auto;padding:20px';
@@ -749,24 +749,29 @@ function showRes() {
       '</div>';
     document.body.appendChild(ov);
     var d=ov.querySelector('#audDate'), cardIn=ov.querySelector('#audCard'),
-        recB=ov.querySelector('#audRec'), st=ov.querySelector('#audSt'),
-        txt=ov.querySelector('#audTxt'), play=ov.querySelector('#audPlay'),
-        msg=ov.querySelector('#audMsg'), nm=ov.querySelector('#audName');
+         recB=ov.querySelector('#audRec'), st=ov.querySelector('#audSt'),
+         txt=ov.querySelector('#audTxt'), play=ov.querySelector('#audPlay'),
+         msg=ov.querySelector('#audMsg'), nm=ov.querySelector('#audName');
+    var catalogCard=presetCard?String(presetCard).replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,' ').trim():'';
     var now=new Date(); d.value=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
     // подсказка «карта дня / КПУ» из открытого дня
     var dc='', kk='', k2='';
+    if(presetCard){ dc=String(presetCard); cardIn.value=dc; }
     try{
       var p=document.getElementById('dayPanel');
       if(p && p.style.display!=='none'){
         var caps=p.querySelectorAll('.cap'), vals={};
         for(var i=0;i<caps.length;i++){ var t=caps[i].textContent.trim(), nn=caps[i].parentNode.querySelector('.nm'); if(nn) vals[t]=nn.textContent.trim(); }
-        dc=vals['Ресурс дня']||''; kk=vals['Космический гид (КПУ)']||''; k2=vals['КПУ (вторая)']||vals['КПУ']||'';
-        if(dc||kk) cardIn.value=(dc+(kk?' / КПУ '+kk:'')).trim();
+        if(!presetCard){
+          dc=vals['Ресурс дня']||''; kk=vals['Космический гид (КПУ)']||''; k2=vals['КПУ (вторая)']||vals['КПУ']||'';
+          if(dc||kk) cardIn.value=(dc+(kk?' / КПУ '+kk:'')).trim();
+        }
       }
       if(typeof cur!=='undefined' && typeof sel!=='undefined' && sel){ d.value=cur.y+'-'+pad(cur.m+1)+'-'+pad(sel); }
     }catch(e){}
     function ext(){ var t=(blob&&blob.type)||''; return t.indexOf('mp4')>=0?'.m4a':'.webm'; }
-    function upd(){ nm.textContent='Имя файла: '+fname(d.value, cardIn.value, blob?ext():'.webm'); }
+    function saveName(){ return catalogCard ? ('Карта — '+catalogCard+(blob?ext():'.webm')) : fname(d.value, cardIn.value, blob?ext():'.webm'); }
+    function upd(){ nm.textContent='Имя файла: '+saveName(); }
     d.onchange=upd; cardIn.oninput=upd; upd();
     // --- статус: какие записи на эту дату уже подключены + кнопки выбора «что записываем» ---
     var mode='day';
@@ -831,7 +836,7 @@ function showRes() {
       var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
     }
     function doSave(again, force){
-      var name=fname(d.value, cardIn.value, ext());
+       var name=saveName();
       if(!blob){ msg.style.color='#fa8'; msg.textContent='Сначала запиши запись и нажми ■ Стоп'; return; }
       if(dirH && !force){
         return dirH.getFileHandle(name).then(function(){
@@ -854,7 +859,7 @@ function showRes() {
       }catch(e){ dl(name); }
     }
     ov.querySelector('#audSave').onclick=function(){ doSave(false); };
-    ov.querySelector('#audDl').onclick=function(){ if(blob){ dl(fname(d.value, cardIn.value, ext())); } else { msg.style.color='#fa8'; msg.textContent='Пока нечего скачивать — нет записи'; } };
+     ov.querySelector('#audDl').onclick=function(){ if(blob){ dl(saveName()); } else { msg.style.color='#fa8'; msg.textContent='Пока нечего скачивать — нет записи'; } };
     ov.querySelector('#audCls').onclick=function(){ try{ if(rec&&rec.state==='recording'){ rec.stop(); } }catch(e){} try{ if(sr){ sr.onend=null; sr.stop(); } }catch(e){} ov.remove(); };
   };
 })();
@@ -875,11 +880,12 @@ function showRes() {
       '<div style="text-align:center;margin-bottom:14px;color:#e8c07a">✅ Записано: '+withAudio+' из 52 &nbsp; ◯ Осталось: '+(52-withAudio)+'</div>';
     suits.forEach(function(s){
       h+='<h3 style="border-bottom:1px solid #555;padding-bottom:5px;margin-top:18px">'+s[0]+' '+s[1]+'</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px">';
-      ranks.forEach(function(r){ var card=r+' '+s[1], f=src(card); h+='<div style="padding:8px 10px;border:1px solid '+(f?'#596f4d':'#444')+';border-radius:6px;color:'+(f?'#d8f0c8':'#aaa')+'">'+(f?'✅':'◯')+' <b>'+card+'</b>'+(f?'<div style="font-size:11px;color:#9aa;word-break:break-all;margin-top:3px">'+f+'</div>':''); h+='</div>'; });
+      ranks.forEach(function(r){ var card=r+' '+s[1], f=src(card); h+='<button type="button" class="audioCardItem" data-card="'+card.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:left;padding:9px 10px;border:1px solid '+(f?'#596f4d':'#444')+';border-radius:6px;background:'+(f?'#202b20':'#20202a')+';color:'+(f?'#d8f0c8':'#ddd')+';cursor:pointer;font-family:Georgia,serif">'+(f?'✅':'◯')+' <b>'+card+'</b>'+(f?'<div style="font-size:11px;color:#9aa;word-break:break-all;margin-top:3px">запись есть — нажми, чтобы открыть и перезаписать</div>':'<div style="font-size:11px;color:#9aa;margin-top:3px">нажми, чтобы записать</div>')+'</button>'; });
       h+='</div>';
     });
     h+='<div style="text-align:center;margin:22px 0"><button id="audioCatalogClose" style="padding:9px 18px;cursor:pointer">✕ Закрыть</button></div></div>';
     ov.innerHTML=h; document.body.appendChild(ov); document.getElementById('audioCatalogClose').onclick=function(){ov.remove();};
+    Array.prototype.forEach.call(ov.querySelectorAll('.audioCardItem'),function(b){ b.onclick=function(){ var card=b.getAttribute('data-card'); ov.remove(); window.openAudio(card); }; });
   };
 })();
 document.getElementById('projBtn').onclick = function(e){ e.stopPropagation(); var m=document.getElementById('projMenu'); m.style.display=(m.style.display==='block')?'none':'block'; };
