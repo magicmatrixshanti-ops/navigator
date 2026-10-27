@@ -470,7 +470,7 @@ function playVoice(src) {
     const ctx = (cput && cput.p) ? ('<br>✨ <b>В плюс (ресурс):</b> ' + cput.p + '<br>🌀 <b>В минус (на трансформацию):</b> ' + (cput.m || '')) : ((tp && tp.d ? ' — ' + tp.d : (pd ? ' — ' + pd.d : '')));
     h += keyLine(cpu);
     h += '<div class="desc"><b>Космический гид: ' + rus(cpu) + '</b><span style="font-size:11px;opacity:.7"> — планетный управитель дня</span>' + ctx + '</div>';
-     if (coreVoice(cpu)) h += '<button class="pbtn" id="scpubtn" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (КПУ)</button>';
+     h += '<button class="pbtn" id="cpusbtn" style="background:#111;color:#fff;border-color:#111">▶ Послушать космический гид (КПУ)</button>';
   } else if (cput && cput.note) {
     h += '<div class="desc"><b>Космический гид</b><span style="font-size:11px;opacity:.7"> — событийный план, навигатор</span><br>' + cput.note + '</div>';
   }
@@ -479,7 +479,7 @@ function playVoice(src) {
     h += keyLine(cpu2);
     h += '<div class="desc"><b>Второй космический гид: ' + rus(cpu2) + '</b><span style="font-size:11px;opacity:.7"> — второй планетный управитель дня</span>' +
       ((tp2 && tp2.d) ? ' — ' + tp2.d : (pd2 ? ' — ' + pd2.d : '')) + '</div>';
-     if (coreVoice(cpu2)) h += '<button class="pbtn" id="scpubtn2" style="background:#7a2c2c;color:#fff;border-color:#7a2c2c">▶ Послушать голосом от Шанти (второй КПУ)</button>';
+      h += '<button class="pbtn" id="cpu2sbtn" style="background:#111;color:#fff;border-color:#111">▶ Послушать второй космический гид (КПУ)</button>';
   }
   h += '<div class="call"><b>Хотите подробнее?</b> Посмотрите событийный план на год: какие задачи стоят перед вами в этом году и какие ресурсы есть у вас для их решения. И помните: есть две ветки реальности — работать можно по обеим.</div>';
   h += moreBox(birthKey(), '', c, dkey);
@@ -494,9 +494,7 @@ function playVoice(src) {
    if (sb) sb.onclick = () => {
      if (voiceMode()==='c') { var src=coreVoice(c) || VOICE[dkey]; if(src) playVoice(src); return; } // в режиме «С» ядро карты или тишина
      let t = sel + ' ' + MON_GEN[cur.m] + '. Карта дня — ' + speakName(c) + '. ' + shortCore((tc && tc.d) || (cd && cd.d) || '');
-    if (cpu) t += ' Космический гид — ' + speakName(cpu) + '. ' + shortCore((tp && tp.d) || (pd && pd.d) || '');
-    if (cpu2) { const tp2 = T[cpu2], pd2 = DATA.cards[cpu2]; t += ' Второй космический гид — ' + speakName(cpu2) + '. ' + shortCore((tp2 && tp2.d) || (pd2 && pd2.d) || ''); }
-    speakRu(t, 'pavel');
+     speakRu(t, 'pavel');
   };
   const db = document.getElementById('dbtn');
   if (db) db.onclick = () => {
@@ -507,10 +505,18 @@ function playVoice(src) {
   if (mb) mb.onclick = () => openMaster(dkey, 'dates');
   const ab = document.getElementById('audbtn');
   if (ab) ab.onclick = () => openAudio();
-   const scpu = document.getElementById('scpubtn');
-   if (scpu) scpu.onclick = () => { if (voiceMode()==='c') { var src=coreVoice(cpu); if(src) playVoice(src); } };
-   const scpu2 = document.getElementById('scpubtn2');
-   if (scpu2) scpu2.onclick = () => { if (voiceMode()==='c') { var src=coreVoice(cpu2); if(src) playVoice(src); } };
+   const cpus = document.getElementById('cpusbtn');
+   if (cpus) cpus.onclick = () => {
+     if (voiceMode()==='c') { var src=coreVoice(cpu); if(src) playVoice(src); return; }
+     var cpuText = (cput && cput.p) ? 'В плюс, ресурс: ' + cput.p + '. В минус, на трансформацию: ' + (cput.m || '') : ((tp && tp.d) || (pd && pd.d) || '');
+     speakRu('Космический гид — ' + speakName(cpu) + '. ' + cpuText, 'pavel');
+   };
+   const cpu2s = document.getElementById('cpu2sbtn');
+   if (cpu2s) cpu2s.onclick = () => {
+     if (voiceMode()==='c') { var src=coreVoice(cpu2); if(src) playVoice(src); return; }
+     const tp2 = T[cpu2], pd2 = DATA.cards[cpu2];
+     speakRu('Второй космический гид — ' + speakName(cpu2) + '. ' + ((tp2 && tp2.d) || (pd2 && pd2.d) || ''), 'pavel');
+   };
   if (window.__res) showRes();
 }
 
