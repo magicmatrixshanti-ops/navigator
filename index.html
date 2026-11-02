@@ -91,13 +91,13 @@
 </head>
 <body>
 <script>
-// ===== ВХОД НА КУРС: кодовое слово, окна 9:00–10:00 и 21:00–22:00 МСК =====
+// ===== ВХОД НА КУРС: кодовое слово, окна 9:00–10:00, 21:00–22:00 и 22:00–23:00 МСК =====
 (function(){
   var WORDS = { '2026-10-22': 'Начало 3 курса 8D-реальность «Квантовый Пульт: Материализация»', '2026-10-23': 'туз треф', '2026-10-24': 'Король червы', '2026-10-25': 'Дама червы', '2026-10-26': 'Валет червы', '2026-10-27': '10 червы', '2026-10-28': '9 червы', '2026-10-29': '8 червы', '2026-10-30': '7 червы', '2026-10-31': '6 червы', '2026-11-01': '8 бубен', '2026-11-02': '7 бубен', '2026-11-03': '6 бубен', '2026-11-04': '5 бубен', '2026-11-05': '4 бубен', '2026-11-06': '3 бубен', '2026-11-07': '2 бубен', '2026-11-08': 'Туз бубен', '2026-11-09': 'Король треф', '2026-11-10': 'Дама треф', '2026-11-11': 'Валет треф', '2026-11-12': '10 треф', '2026-11-13': '9 треф', '2026-11-14': '8 треф', '2026-11-15': '7 треф', '2026-11-16': '6 треф', '2026-11-17': '5 треф', '2026-11-18': '4 треф', '2026-11-19': '3 треф', '2026-11-20': '2 треф', '2026-11-21': 'Туз треф', '2026-11-22': 'Король червы', '2026-11-23': 'Дама червы', '2026-11-24': 'Валет червы', '2026-11-25': '10 червы', '2026-11-26': '9 червы', '2026-11-27': '8 червы', '2026-11-28': '7 червы', '2026-11-29': '6 червы', '2026-11-30': '5 червы', '2026-12-01': '6 бубен' };
-  function win(d){ // окна входа по Москве: 9–10 и 21–22
+  function win(d){ // окна входа по Москве: 9–10, 21–22 и 22–23
     var h = d.getHours();
     if (d.getFullYear() === 2026 && (d.getMonth() + 1) === 10 && d.getDate() === 22) return true; // 22.10 — вход открыт весь день (демо)
-    return (h >= 9 && h < 10) || (h >= 21 && h < 22);
+    return (h >= 9 && h < 10) || (h >= 21 && h < 23);
   }
   function norm(s){ return String(s).toLowerCase().replace(/[«»"'’:!:,\-—]/g,'').replace(/\s+/g,' ').trim(); }
   function msk(){ return new Date(Date.now() + (new Date().getTimezoneOffset() + 180) * 60000); }
@@ -108,14 +108,17 @@
   var entered = null;
   try { entered = localStorage.getItem('matr_gate'); } catch(e){}
   if (!force && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || master)) return; // на своём ПК и у мастера вход не спрашивается; участники входят только в окна
-  var d = msk(), dk = dkey(d), word = WORDS[dk] || '';
+  var d = msk(), dk = dkey(d), nextDate = new Date(d.getTime());
+  nextDate.setDate(nextDate.getDate() + 1);
+  var nextDk = dkey(nextDate), eveningNext = d.getHours() >= 22 && d.getHours() < 23;
+  var accessKey = eveningNext ? nextDk : dk, word = WORDS[accessKey] || '';
   var ov = document.createElement('div');
   ov.id = 'gateBox';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 15% 8%,#fffdf7,transparent 55%),linear-gradient(#faf6f0,#f1e7d3);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Georgia,serif';
   ov.innerHTML = '<div style="max-width:400px;width:100%;background:#fff;border:2px solid #c9b98f;border-radius:14px;box-shadow:0 12px 40px rgba(122,92,46,.3);padding:26px 22px;text-align:center">' +
     '<div style="font-size:30px;margin-bottom:6px">✦</div>' +
     '<div style="font-size:19px;color:#7a5c2e;letter-spacing:1.5px;margin-bottom:10px">Навигатор по Матрице</div>' +
-    '<div style="font-size:14px;line-height:1.5;color:#5a5040;margin-bottom:14px">Приложение для участников курса.<br>Вход — по кодовому слову из чата,<br>ежедневно <b>с 9:00 до 10:00</b> или <b>с 21:00 до 22:00 по Москве</b>.</div>' +
+    '<div style="font-size:14px;line-height:1.5;color:#5a5040;margin-bottom:14px">Приложение для участников курса.<br>Вход — по кодовому слову из чата:<br><b>9:00–10:00</b> — код текущего дня;<br><b>21:00–22:00</b> — код текущего дня;<br><b>22:00–23:00</b> — код следующего дня по Москве.</div>' +
     '<input id="gateIn" placeholder="Кодовое слово" style="font-family:Georgia,serif;font-size:16px;width:100%;padding:10px 12px;border:1px solid #d8cdb8;border-radius:8px;background:#fffdf7;margin-bottom:10px;text-align:center">' +
     '<button id="gateBtn" style="font-family:Georgia,serif;font-size:15px;width:100%;padding:10px;border:1px solid #b89a5e;background:#f3e8d2;color:#7a5c2e;font-weight:bold;border-radius:8px;cursor:pointer">Открыть навигатор</button>' +
     '<div id="gateMsg" style="font-size:13.5px;color:#a8452a;margin-top:10px;min-height:18px"></div>' +
@@ -126,11 +129,11 @@
     var v = (document.getElementById('gateIn').value || '').trim().toLowerCase();
     var msg = document.getElementById('gateMsg');
     if (norm(v) === 'создатель') { try { localStorage.setItem('matr_master','1'); localStorage.setItem('matr_master_date', dk); } catch(e){} ov.parentNode.removeChild(ov); return; } // слово мастера — вход всегда и везде
-    if (!word) { msg.textContent = 'Сегодня вход закрыт — нет кодового слова.'; return; }
+    if (!word) { msg.textContent = eveningNext ? 'Код на следующий день ещё не подготовлен' : 'Сегодня вход закрыт — нет кодового слова.'; return; }
     var h = d.getHours();
-    if (!win(d)) { msg.textContent = 'Окно входа: с 9:00 до 10:00 или с 21:00 до 22:00 по Москве.'; return; }
+    if (!win(d)) { msg.textContent = 'Окно входа: 9:00–10:00 и 21:00–22:00 — код текущего дня; 22:00–23:00 — код следующего дня по Москве.'; return; }
     if (norm(v) !== norm(word)) { msg.textContent = 'Кодовое слово не подошло. Проверьте чат.'; return; }
-    try { localStorage.setItem('matr_gate', dk); } catch(e){}
+    try { localStorage.setItem('matr_gate', accessKey); } catch(e){}
     ov.parentNode.removeChild(ov);
   }
   setTimeout(function(){
