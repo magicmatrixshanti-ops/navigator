@@ -148,6 +148,7 @@
   <button id="projBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🔮 Проект «Матрица»</button>
   <button id="voiceBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🎙 Голос: М</button>
   <button id="speedBtn" style="padding:7px 10px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">⏩ Скорость: 1,2×</button>
+<button class="pbtn" id="matrix3d8dBtn">✦ Матрица 3D и 8D: путь к реализации желаемого</button><div class="pract" id="matrix3d8dBox"><h3>✦ Матрица 3D и 8D: путь к реализации желаемого</h3><p><b>Как выйти из автоматизма 3D и войти в осознанное действие 8D</b></p><p>3D — внешняя действительность: карта дня, общий ресурс дня, КПУ и внешний ключ планетарного управителя.</p><p>8D — внутреннее состояние человека: личная карта, личный код доступа к ресурсу, код доступа к КПУ и личное восприятие.</p><p><b>8D — это твоё внутреннее состояние. Меняя внутреннее состояние, ты меняешь для себя декорации в Матрице 3D, потому что меняется твоё восприятие.</b></p><p>Навигатор помогает думать, творить, действовать и принимать осознанные решения, оттачивая логическое и творческое мышление для счастливого проживания своей жизни.</p><p><b>Наблюдение → понимание → решение → действие → проверка результата.</b></p><p>Посмотри на карту дня, почувствуй свой резонанс и выбери один осознанный шаг.</p></div>
   <div id="projMenu" style="display:none;max-width:360px;margin:6px auto 0;background:#fffdf6;border:1px solid #c9b98f;border-radius:10px;box-shadow:0 8px 24px rgba(122,92,46,.25);overflow:hidden;font-family:Georgia,serif;text-align:left">
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;cursor:pointer" id="projNav">📅 <b>Навигатор дня</b><div style="font-size:12px;opacity:.7">карта дня и резонанс — здесь, открывает календарь</div></div>
     <div style="padding:10px 14px;border-bottom:1px solid #eadfc2;opacity:.55">🔮 <b>Матрица (по дате рождения)</b><div style="font-size:12px">скоро — полная карта рождения, 52 карты</div></div>
@@ -593,7 +594,6 @@ function showRes() {
   p.style.display = 'block';
   p.innerHTML = '<h2>✦ Код доступа к ресурсу ✦</h2>' +
     '<button class="pbtn" id="sbtn2" style="background:#111;color:#fff;border-color:#111;margin:0 0 10px">▶ Послушать код доступа</button>' +
-    "<button class=\"pbtn\" id=\"matrix3d8dBtn\">✦ Матрица 3D и 8D: путь к реализации желаемого</button><div class=\"pract\" id=\"matrix3d8dBox\"><h3>✦ Матрица 3D и 8D: путь к реализации желаемого</h3><p><b>Как выйти из автоматизма 3D и войти в осознанное действие 8D</b></p><p>3D — внешняя действительность: карта дня, общий ресурс дня, КПУ и внешний ключ планетарного управителя.</p><p>8D — внутреннее состояние человека: личная карта, личный код доступа к ресурсу, код доступа к КПУ и личное восприятие.</p><p><b>8D — это твоё внутреннее состояние. Меняя внутреннее состояние, ты меняешь для себя декорации в Матрице 3D, потому что меняется твоё восприятие.</b></p><p>Навигатор помогает думать, творить, действовать и принимать осознанные решения, оттачивая логическое и творческое мышление для счастливого проживания своей жизни.</p><p><b>Наблюдение → понимание → решение → действие → проверка результата.</b></p><p>Посмотри на карту дня, почувствуй свой резонанс и выбери один осознанный шаг.</p></div>" +
     '<div class="row">' +
       '<div><div class="cap">Ресурс дня</div>' + face(r.dc) + '<div class="nm">число ' + r.nd + '</div></div>' +
       '<div class="eq">+</div>' +
@@ -634,8 +634,6 @@ function showRes() {
       '<div class="res"><div class="desc"><b>\uD83D\uDD17 Ключ ко второму планетарному управителю: ' + rus(g2.rc || '\u2014') + '</b>' + (g2desc ? ' \u2014 ' + g2desc : '') + '</div></div>' : '') +
     '<div class="call"><b>Хотите подробнее?</b> Посмотрите событийный план на год: какие задачи стоят перед вами в этом году и какие ресурсы есть у вас для их решения. И помните: есть две ветки реальности — работать можно по обеим.</div>' +
     moreBox(bk, '2', r.rc, bk);
-  const matrix3d8dBtn = document.getElementById('matrix3d8dBtn');
-  if (matrix3d8dBtn) matrix3d8dBtn.onclick = () => { const b = document.getElementById('matrix3d8dBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; };
   const db = document.getElementById('dbtn2');
   if (db) db.onclick = () => {
     const b = document.getElementById('moreBox2');
@@ -939,6 +937,8 @@ document.getElementById('prev').onclick = () => { cur.m--; if (cur.m < 0) { cur.
 document.getElementById('next').onclick = () => { cur.m++; if (cur.m > 11) { cur.m = 0; cur.y++; } sel = null; document.getElementById('dayPanel').style.display = 'none'; render(); };
 document.getElementById('go').onclick = showRes;
 document.getElementById('bdate').onchange = () => { showRes(); if (sel) showDay(); };
+const matrix3d8dBtn = document.getElementById('matrix3d8dBtn');
+  if (matrix3d8dBtn) matrix3d8dBtn.onclick = () => { const b = document.getElementById('matrix3d8dBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; };
 render();
 </script>
 </body>
