@@ -169,8 +169,11 @@
 <div class="panel" id="dayPanel" style="display:none"></div>
 
 <div class="birth">
-  <label for="bdate">Дата рождения:</label>
-  <input type="date" id="bdate" min="1900-01-01">
+  <label for="birthDay">Дата рождения:</label>
+   <select id="birthDay" aria-label="День рождения"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select>
+   <select id="birthMonth" aria-label="Месяц рождения"><option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select>
+   <input type="number" id="birthYear" placeholder="Год — для прогностики" disabled aria-label="Год рождения для прогностики">
+   <input type="hidden" id="bdate" value="">
   <button class="mon" id="go" style="border:1px solid #d8cdb8;border-radius:8px;background:#fff;padding:6px 16px;cursor:pointer;font-weight:bold;min-width:auto;letter-spacing:0">Код доступа (резонанс):</button>
 </div>
 <div class="panel" id="resPanel" style="display:none"></div>
@@ -935,6 +938,10 @@ document.getElementById('projDates').onclick = function(){ document.getElementBy
 document.addEventListener('click', function(e){ var m=document.getElementById('projMenu'); if(m && m.style.display==='block' && !m.contains(e.target)) m.style.display='none'; });
 document.getElementById('prev').onclick = () => { cur.m--; if (cur.m < 0) { cur.m = 11; cur.y--; } sel = null; document.getElementById('dayPanel').style.display = 'none'; render(); };
 document.getElementById('next').onclick = () => { cur.m++; if (cur.m > 11) { cur.m = 0; cur.y++; } sel = null; document.getElementById('dayPanel').style.display = 'none'; render(); };
+function syncBirthDayMonth(){ const d=document.getElementById('birthDay').value, m=document.getElementById('birthMonth').value; document.getElementById('bdate').value='2000-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+ document.getElementById('birthDay').onchange=syncBirthDayMonth;
+ document.getElementById('birthMonth').onchange=syncBirthDayMonth;
+ syncBirthDayMonth();
 document.getElementById('go').onclick = showRes;
 document.getElementById('bdate').onchange = () => { showRes(); if (sel) showDay(); };
 const matrix3d8dBtn = document.getElementById('matrix3d8dBtn');
