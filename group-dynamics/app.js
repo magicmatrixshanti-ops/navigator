@@ -268,8 +268,13 @@
     if (selectedDate) $("#selected-date").value = selectedDate;
     const ids = (urlContext.get("participantIds") || "").split(",").filter(Boolean);
     const source = (() => { try { return JSON.parse(localStorage.getItem("matrix_test_environment_events_v1") || ""); } catch (error) { return null; } })();
+    const publicSource = (() => { try { return JSON.parse(localStorage.getItem("matrix_public_events_v1") || ""); } catch (error) { return null; } })();
     let people = source && Array.isArray(source.people) ? source.people : [];
     let sourceLabel = "этого браузера";
+    if (ids.length && ids.some((id) => !people.some((person) => person.id === id)) && publicSource && Array.isArray(publicSource.people)) {
+      people = publicSource.people;
+      sourceLabel = "раздела «Мои события»";
+    }
     if (ids.length && ids.some((id) => !people.some((person) => person.id === id))) {
       try {
         const response = await fetch(STATE_API);
