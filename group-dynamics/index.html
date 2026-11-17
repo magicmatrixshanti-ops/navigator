@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Локальная динамика отношений команды.">
+  <title>Динамика отношений</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p>НАВИГАТОР В МАТРИЦЕ · ЛОКАЛЬНАЯ ПРОВЕРКА</p>
+      <h1>Динамика отношений</h1>
+       <span>Команда · персонаж · выбранная дата</span>
+    </header>
+
+    <section class="panel">
+       <div class="heading"><div><p>СОСТАВ КОМАНДЫ</p><h2>Фактические участники</h2></div><b id="count">0 / 22</b></div>
+      <label class="team-label">Название команды<input id="team-title" maxlength="80" placeholder="Например, команда проекта"></label>
+        <p class="hint">Добавьте от 2 до 22 фактических участников. Все введённые карты участвуют в общей карте команды. Для связи с персонажем он исключается только временно из расчёта оставшейся группы.</p>
+        <p id="navigator-context" class="hint" hidden></p>
+        <div id="people"></div>
+        <div class="buttons"><button id="add" class="pale" type="button">+ Добавить участника</button><button id="run" type="button">Рассчитать динамику</button></div>
+      <div id="error" role="alert"></div>
+    </section>
+
+    <div id="out" hidden>
+      <section class="panel top">
+        <p>ШАГ 1 · ПОСТОЯННОЕ ОБЩЕЕ ПОЛЕ</p>
+        <h2 id="out-title">Общее поле команды</h2>
+        <div id="team-card" class="field"></div>
+      </section>
+      <section class="panel">
+        <p>ДЕВЯТЬ ПАРАМЕТРОВ ОБЩЕГО ПОЛЯ</p>
+        <h2>Девять общих параметров</h2>
+        <p class="hint">Логика идёт последовательно: общее поле команды, затем отдельное проявление для каждого участника, затем следующее общее поле. Пары и подгруппы не создаются.</p>
+        <div id="params" class="group-dynamics-table"></div>
+      </section>
+      <section class="panel" id="person-panel">
+        <p>ШАГ 2 · ГРУППА БЕЗ ПЕРСОНАЖА ↔ ПЕРСОНАЖ</p>
+        <h2>Динамика выбранного человека с командой</h2>
+        <p class="hint">Выберите персонажа. Он остаётся в исходном списке, но не входит в карту оставшейся группы для этого расчёта.</p>
+        <div id="person-picker" class="person-picker"></div>
+        <div id="person-result"></div>
+      </section>
+       <section class="panel" id="day-panel">
+         <p>ШАГ 3 · ДНЕВНАЯ АКТИВАЦИЯ</p>
+         <h2>Общее поле команды ↔ карта выбранной даты</h2>
+         <label class="date-choice">Дата для дневной активации<input id="selected-date" type="date" aria-describedby="selected-date-help"></label>
+         <p id="selected-date-help" class="hint">Выберите дату здесь. Сразу появятся карта дня, общий ресурс дня и дневная активация команды.</p>
+         <div id="day-result"></div>
+       </section>
+    </div>
+    <footer>Локальная рабочая версия. Периоды, прогноз, пары и подгруппы не подключены.</footer>
+  </main>
+   <script src="data.js"></script>
+   <script src="../texts.js"></script>
+   <script src="../kpu_practices.js"></script>
+   <script src="../kpu_access_practices.js"></script>
+    <script src="app.js?v=20261116-group-practice-diagnostic"></script>
+</body>
+</html>

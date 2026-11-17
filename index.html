@@ -88,6 +88,7 @@
     .formula { font-size: 14px; }
   }
 </style>
+<link rel="stylesheet" href="my-events.css">
 </head>
 <body>
 <script>
@@ -146,6 +147,7 @@
 <h1>✦ Навигатор: энергии дня ✦</h1>
 <div style="text-align:center;margin:2px 0 4px">
   <button id="projBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🔮 Проект «Матрица»</button>
+  <button id="myEventsBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">📅 Мои события</button>
   <button id="voiceBtn" style="padding:7px 14px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">🎙 Голос: М</button>
   <button id="speedBtn" style="padding:7px 10px;font-size:14px;cursor:pointer;border:1px solid #c9b98f;background:rgba(201,168,106,.12);color:#7a5c2e;border-radius:8px;font-family:Georgia,serif;letter-spacing:1px">⏩ Скорость: 1,2×</button>
 <button class="pbtn" id="matrix3d8dBtn">✦ Матрица 3D и 8D: путь к реализации желаемого</button><div class="pract" id="matrix3d8dBox"><h3>✦ Матрица 3D и 8D: путь к реализации желаемого</h3><p><b>Как выйти из автоматизма 3D и войти в осознанное действие 8D</b></p><p>3D — внешняя действительность: карта дня, общий ресурс дня, КПУ и внешний ключ планетарного управителя.</p><p>8D — внутреннее состояние человека: личная карта, личный код доступа к ресурсу, код доступа к КПУ и личное восприятие.</p><p><b>8D — это твоё внутреннее состояние. Меняя внутреннее состояние, ты меняешь для себя декорации в Матрице 3D, потому что меняется твоё восприятие.</b></p><p>Навигатор помогает думать, творить, действовать и принимать осознанные решения, оттачивая логическое и творческое мышление для счастливого проживания своей жизни.</p><p><b>Наблюдение → понимание → решение → действие → проверка результата.</b></p><p>Посмотри на карту дня, почувствуй свой резонанс и выбери один осознанный шаг.</p></div>
@@ -927,8 +929,10 @@ document.getElementById('voiceBtn').onclick = function(){
  if(!masterUI()){
    var _pb = document.getElementById('projBtn');
    var _pm = document.getElementById('projMenu');
+   var _meb = document.getElementById('myEventsBtn');
    if(_pb) _pb.style.display='none';
    if(_pm) _pm.style.display='none';
+   if(_meb) _meb.style.display='none';
  }
  document.getElementById('projNav').onclick = function(){ document.getElementById('projMenu').style.display='none'; };
 document.getElementById('projMaster').onclick = function(){ document.getElementById('projMenu').style.display='none'; openMaster(null,'cards'); };
@@ -948,5 +952,6 @@ const matrix3d8dBtn = document.getElementById('matrix3d8dBtn');
   if (matrix3d8dBtn) matrix3d8dBtn.onclick = () => { const b = document.getElementById('matrix3d8dBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; };
 render();
 </script>
+<script src="my-events.js"></script>
 </body>
 </html>
